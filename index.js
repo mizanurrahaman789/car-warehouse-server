@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+// const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -21,6 +22,18 @@ async function run() {
             await client.connect();
             const itemsCollection = client.db('CarWarehouse').collection('items');
 
+
+            //Auth
+
+            app.post('/login', async (req, res) => {
+                  const user = req.body;
+                  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                        expiresIn: '1d'
+                  });
+                  res.send({ accessToken });
+            })
+
+            //Items
             app.get('/items', async (req, res) => {
                   const query = {};
                   const cursor = itemsCollection.find(query);
@@ -56,6 +69,9 @@ app.get('/', (req, res) => {
       res.send('car warehouse start ')
 });
 
+app.get('/hero', (req, res) => {
+      res.send('raning caewarehouse')
+})
 
 app.listen(port, () => {
       console.log('listening to port', port);
